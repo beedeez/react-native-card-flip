@@ -253,7 +253,7 @@ class CardFlip extends Component<Props> {
 
 	render() {
 		const { zoom } = this.state;
-		const { flipZoom, sides } = this.props;
+		const { flipZoom, children } = this.props;
 
 		// Handle cardA transformation
 		const cardATransform = this.getCardATransformation();
@@ -275,10 +275,10 @@ class CardFlip extends Component<Props> {
 		return (
 			<Animated.View style={[this.props.style, scaling]}>
 				<Animated.View style={[styles.cardContainer, cardATransform]}>
-					{sides[0]}
+					{children[0]}
 				</Animated.View>
 				<Animated.View style={[styles.cardContainer, cardBTransform]}>
-					{sides[1]}
+					{children[1]}
 				</Animated.View>
 			</Animated.View>
 		);
