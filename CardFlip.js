@@ -12,7 +12,8 @@ class CardFlip extends Component<Props> {
 			rotation: new Animated.ValueXY({ x: 50, y: 50 }),
 			zoom: new Animated.Value(0),
 			rotateOrientation: '',
-			flipDirection: 'y'
+			flipDirection: 'y',
+			isFlipping: false
 		};
 	}
 
@@ -142,6 +143,7 @@ class CardFlip extends Component<Props> {
 		const { rotation, progress, zoom, side } = this.state;
 		this.props.onFlip(side === 0 ? 1 : 0);
 		this.props.onFlipStart(side === 0 ? 1 : 0);
+		this.setState({ isFlipping: true });
 		Animated.parallel([
 			Animated.timing(progress, {
 				toValue: side === 0 ? 100 : 0,
@@ -166,8 +168,18 @@ class CardFlip extends Component<Props> {
 				useNativeDriver: true
 			})
 		]).start(() => {
+			this.setState({ isFlipping: false });
 			this.props.onFlipEnd(side === 0 ? 1 : 0);
 		});
+	}
+
+	getCardAPerspective() {
+		// Web: a resting perspective() keeps the face on a 3D layer, which Chrome rasterizes blurry under a scaled ancestor
+		if (Platform.OS === 'web' && !this.state.isFlipping) {
+			return [];
+		}
+
+		return [{ perspective: this.props.perspective }];
 	}
 
 	getCardATransformation() {
@@ -183,7 +195,7 @@ class CardFlip extends Component<Props> {
 		const sideATransform = {
 			opacity: sideAOpacity,
 			zIndex: side === 0 ? 1 : 0,
-			transform: [{ perspective: this.props.perspective }]
+			transform: this.getCardAPerspective()
 		};
 
 		if (rotateOrientation === 'x') {
